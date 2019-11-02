@@ -11,6 +11,8 @@ namespace Radarr.Api.V3.NetImport
         public string RootFolderPath { get; set; }
         public int QualityProfileId { get; set; }
         public MovieStatusType MinimumAvailability { get; set; }
+        public NetImportType ListType { get; set; }
+        public int ListOrder { get; set; }
     }
 
     public class NetImportResourceMapper : ProviderResourceMapper<NetImportResource, NetImportDefinition>
@@ -30,6 +32,8 @@ namespace Radarr.Api.V3.NetImport
             resource.RootFolderPath = definition.RootFolderPath;
             resource.QualityProfileId = definition.ProfileId;
             resource.MinimumAvailability = definition.MinimumAvailability;
+            resource.ListType = definition.ListType;
+            resource.ListOrder = (int)definition.ListType;
 
             return resource;
         }
@@ -48,7 +52,11 @@ namespace Radarr.Api.V3.NetImport
             definition.ShouldMonitor = resource.ShouldMonitor;
             definition.RootFolderPath = resource.RootFolderPath;
             definition.ProfileId = resource.QualityProfileId;
+<<<<<<< HEAD:src/Radarr.Api.V3/NetImport/NetImportResource.cs
             definition.MinimumAvailability = resource.MinimumAvailability;
+=======
+            definition.ListType = resource.ListType;
+>>>>>>> a6bf4801e... New: NetImport Lists Grouped by Type:src/Radarr.Api.V2/NetImport/NetImportResource.cs
 
             return definition;
         }

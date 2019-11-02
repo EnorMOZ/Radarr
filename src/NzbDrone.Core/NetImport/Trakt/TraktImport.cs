@@ -8,6 +8,8 @@ namespace NzbDrone.Core.NetImport.Trakt
     public class TraktImport : HttpNetImportBase<TraktSettings>
     {
         public override string Name => "Trakt List";
+
+        public override NetImportType ListType => NetImportType.Other;
         public override bool Enabled => true;
         public override bool EnableAuto => false;
 
