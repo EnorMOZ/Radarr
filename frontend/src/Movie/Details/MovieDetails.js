@@ -30,7 +30,9 @@ import MoviePoster from 'Movie/MoviePoster';
 import EditMovieModalConnector from 'Movie/Edit/EditMovieModalConnector';
 import DeleteMovieModal from 'Movie/Delete/DeleteMovieModal';
 import MovieHistoryTable from 'Movie/History/MovieHistoryTable';
-import MovieTitlesTable from 'Movie/Titles/MovieTitlesTable';
+import MovieTitlesTable from './Titles/MovieTitlesTable';
+import MovieCastTable from './Cast/MovieCastTable';
+import MovieCrewTable from './Crew/MovieCrewTable';
 import MovieAlternateTitles from './MovieAlternateTitles';
 import MovieDetailsLinks from './MovieDetailsLinks';
 import InteractiveSearchTable from 'InteractiveSearch/InteractiveSearchTable';
@@ -176,6 +178,8 @@ class MovieDetails extends Component {
       inCinemas,
       images,
       alternateTitles,
+      cast,
+      crew,
       // tags,
       isSaving,
       isRefreshing,
@@ -513,6 +517,20 @@ class MovieDetails extends Component {
                   Titles
                 </Tab>
 
+                <Tab
+                  className={styles.tab}
+                  selectedClassName={styles.selectedTab}
+                >
+                  Cast
+                </Tab>
+
+                <Tab
+                  className={styles.tab}
+                  selectedClassName={styles.selectedTab}
+                >
+                  Crew
+                </Tab>
+
                 {
                   selectedTabIndex === 1 &&
                     <div className={styles.filterIcon}>
@@ -543,6 +561,18 @@ class MovieDetails extends Component {
               <TabPanel>
                 <MovieTitlesTable
                   movieId={id}
+                />
+              </TabPanel>
+
+              <TabPanel>
+                <MovieCastTable
+                  cast={cast}
+                />
+              </TabPanel>
+
+              <TabPanel>
+                <MovieCrewTable
+                  crew={crew}
                 />
               </TabPanel>
             </Tabs>
@@ -602,6 +632,8 @@ MovieDetails.propTypes = {
   inCinemas: PropTypes.string.isRequired,
   overview: PropTypes.string.isRequired,
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
+  cast: PropTypes.arrayOf(PropTypes.object).isRequired,
+  crew: PropTypes.arrayOf(PropTypes.object).isRequired,
   alternateTitles: PropTypes.arrayOf(PropTypes.string).isRequired,
   tags: PropTypes.arrayOf(PropTypes.number).isRequired,
   isSaving: PropTypes.bool.isRequired,

@@ -1,0 +1,6 @@
+.poster {
+  flex-shrink: 0;
+  margin-right: 35px;
+  width: 75px;
+  height: 110px;
+}
