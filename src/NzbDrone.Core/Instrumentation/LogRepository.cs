@@ -20,7 +20,7 @@ namespace NzbDrone.Core.Instrumentation
         public void Trim()
         {
             var trimDate = DateTime.UtcNow.AddDays(-7).Date;
-            Delete(c => c.Time <= trimDate);
+            Delete(Builder().WhereLessThan<Log>(x => x.Time, trimDate));
             Vacuum();
         }
     }

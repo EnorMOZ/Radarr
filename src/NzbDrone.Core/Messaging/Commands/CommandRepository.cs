@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Dapper;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Messaging.Events;
 
@@ -20,56 +20,54 @@ namespace NzbDrone.Core.Messaging.Commands
 
     public class CommandRepository : BasicRepository<CommandModel>, ICommandRepository
     {
-        private readonly IMainDatabase _database;
-
         public CommandRepository(IMainDatabase database, IEventAggregator eventAggregator)
             : base(database, eventAggregator)
         {
-            _database = database;
         }
 
         public void Trim()
         {
             var date = DateTime.UtcNow.AddDays(-1);
 
-            Delete(c => c.EndedAt < date);
+            Delete(Builder().WhereLessThan<CommandModel>(x => x.EndedAt, date));
         }
 
         public void OrphanStarted()
         {
-            using (var mapper = _database.GetDataMapper())
+            var sql = @"UPDATE Commands SET Status = @Orphaned, EndedAt = @Ended WHERE Status = @Started";
+            var args = new
+                {
+                    Orphaned = (int) CommandStatus.Orphaned,
+                    Started = (int) CommandStatus.Started,
+                    Ended = DateTime.UtcNow
+                };
+
+            using (var conn = _database.OpenConnection())
             {
-
-                mapper.Parameters.Add(new SQLiteParameter("@orphaned", (int) CommandStatus.Orphaned));
-                mapper.Parameters.Add(new SQLiteParameter("@started", (int) CommandStatus.Started));
-                mapper.Parameters.Add(new SQLiteParameter("@ended", DateTime.UtcNow));
-
-                mapper.ExecuteNonQuery(@"UPDATE Commands
-                                     SET Status = @orphaned, EndedAt = @ended
-                                     WHERE Status = @started");
+                conn.Execute(sql, args);
             }
         }
 
         public List<CommandModel> FindCommands(string name)
         {
-            return Query.Where(c => c.Name == name).ToList();
+            return Query(Builder().WhereEqual<CommandModel>(x => x.Name, name));
         }
 
         public List<CommandModel> FindQueuedOrStarted(string name)
         {
-            return Query.Where(c => c.Name == name)
-                        .AndWhere("[Status] IN (0,1)")
-                        .ToList();
+            return Query(Builder()
+                         .WhereEqual<CommandModel>(x => x.Name, name)
+                         .WhereIn<CommandModel>(x => x.Status, new [] { (int)CommandStatus.Queued, (int)CommandStatus.Started }));
         }
 
         public List<CommandModel> Queued()
         {
-            return Query.Where(c => c.Status == CommandStatus.Queued);
+            return Query(Builder().WhereEqual<CommandModel>(x => x.Status, (int)CommandStatus.Queued));
         }
 
         public List<CommandModel> Started()
         {
-            return Query.Where(c => c.Status == CommandStatus.Started);
+            return Query(Builder().WhereEqual<CommandModel>(x => x.Status, (int)CommandStatus.Started));
         }
 
         public void Start(CommandModel command)

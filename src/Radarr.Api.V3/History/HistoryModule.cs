@@ -44,7 +44,7 @@ namespace Radarr.Api.V3.History
 
             if (model.Movie != null)
             {
-                resource.QualityCutoffNotMet = _upgradableSpecification.CutoffNotMet(model.Movie.Profile.Value, model.Quality);
+                resource.QualityCutoffNotMet = _upgradableSpecification.CutoffNotMet(model.Movie.Profile, model.Quality);
             }
 
             return resource;
@@ -61,13 +61,13 @@ namespace Radarr.Api.V3.History
             if (eventTypeFilter != null)
             {
                 var filterValue = (HistoryEventType)Convert.ToInt32(eventTypeFilter.Value);
-                pagingSpec.FilterExpressions.Add(v => v.EventType == filterValue);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<NzbDrone.Core.History.History>(x => x.EventType, filterValue));
             }
 
             if (downloadIdFilter != null)
             {
                 var downloadId = downloadIdFilter.Value;
-                pagingSpec.FilterExpressions.Add(h => h.DownloadId == downloadId);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<NzbDrone.Core.History.History>(x => x.DownloadId, downloadId));
             }
 
             return ApplyToPage(_historyService.Paged, pagingSpec, h => MapToResource(h, includeMovie));

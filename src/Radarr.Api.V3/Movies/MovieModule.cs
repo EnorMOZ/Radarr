@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using FluentValidation;
 using NzbDrone.Common.Extensions;
@@ -15,6 +15,7 @@ using NzbDrone.Core.Validation;
 using NzbDrone.SignalR;
 using Nancy;
 using Radarr.Http;
+using NLog;
 
 namespace Radarr.Api.V3.Movies
 {
@@ -30,6 +31,7 @@ namespace Radarr.Api.V3.Movies
     {
         protected readonly IMovieService _moviesService;
         private readonly IMapCoversToLocal _coverMapper;
+        private readonly Logger _logger;
 
         public MovieModule(IBroadcastSignalRMessage signalRBroadcaster,
                             IMovieService moviesService,
@@ -39,13 +41,15 @@ namespace Radarr.Api.V3.Movies
                             MovieExistsValidator moviesExistsValidator,
                             MovieAncestorValidator moviesAncestorValidator,
                             ProfileExistsValidator profileExistsValidator,
-                            MovieFolderAsRootFolderValidator movieFolderAsRootFolderValidator
+                           MovieFolderAsRootFolderValidator movieFolderAsRootFolderValidator,
+                           Logger logger
             )
             : base(signalRBroadcaster)
         {
             _moviesService = moviesService;
 
             _coverMapper = coverMapper;
+            _logger = logger;
 
             GetResourceAll = AllMovie;
             GetResourceById = GetMovie;
@@ -78,9 +82,21 @@ namespace Radarr.Api.V3.Movies
 
         private List<MovieResource> AllMovie()
         {
-            var moviesResources = _moviesService.GetAllMovies().ToResource();
+            var watch = Stopwatch.StartNew();
+            var movies = _moviesService.GetAllMovies();
+
+            _logger.Info($"Got movies in {watch.ElapsedMilliseconds}ms");
+            watch.Restart();
+
+            var moviesResources = movies.ToResource();
+            _logger.Info($"Got movie resources in {watch.ElapsedMilliseconds}ms");
+            watch.Restart();
 
             MapCoversToLocal(moviesResources.ToArray());
+
+            _logger.Info($"Mapped covers in {watch.ElapsedMilliseconds}ms");
+            watch.Restart();
+
             PopulateAlternateTitles(moviesResources);
 
             return moviesResources;

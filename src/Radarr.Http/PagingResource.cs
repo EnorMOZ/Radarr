@@ -16,7 +16,7 @@ namespace Radarr.Http
 
     public static class PagingResourceMapper
     {
-        public static PagingSpec<TModel> MapToPagingSpec<TResource, TModel>(this PagingResource<TResource> pagingResource, string defaultSortKey = "Id", SortDirection defaultSortDirection = SortDirection.Ascending)
+        public static PagingSpec<TModel> MapToPagingSpec<TResource, TModel>(this PagingResource<TResource> pagingResource, string defaultSortKey = "Id", SortDirection defaultSortDirection = SortDirection.Ascending) where TModel : ModelBase
         {
             var pagingSpec = new PagingSpec<TModel>
             {

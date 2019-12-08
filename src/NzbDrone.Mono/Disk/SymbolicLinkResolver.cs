@@ -98,7 +98,7 @@ namespace NzbDrone.Mono.Disk
                     var errno = Stdlib.GetLastError();
                     if (errno != Errno.EINVAL)
                     {
-                        _logger.Trace("Checking path {0} for symlink returned error {1}, assuming it's not a symlink.", path, errno);
+                        // _logger.Trace("Checking path {0} for symlink returned error {1}, assuming it's not a symlink.", path, errno);
                     }
 
                     return path;

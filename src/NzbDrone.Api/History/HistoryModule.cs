@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using Nancy;
-using Radarr.Http.Extensions;
 using NzbDrone.Api.Movies;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.History;
 using Radarr.Http;
-using Radarr.Http.REST;
 using NzbDrone.Core.DecisionEngine.Specifications;
 
 namespace NzbDrone.Api.History
@@ -37,7 +35,7 @@ namespace NzbDrone.Api.History
 
             if (model.Movie != null)
             {
-                resource.QualityCutoffNotMet = _qualityUpgradableSpecification.CutoffNotMet(model.Movie.Profile.Value, model.Quality);
+                resource.QualityCutoffNotMet = _qualityUpgradableSpecification.CutoffNotMet(model.Movie.Profile, model.Quality);
             }
 
             return resource;
@@ -52,13 +50,13 @@ namespace NzbDrone.Api.History
             if (filter != null && filter.Key == "eventType")
             {
                 var filterValue = (HistoryEventType)Convert.ToInt32(filter.Value);
-                pagingSpec.FilterExpressions.Add(v => v.EventType == filterValue);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Core.History.History>(x => x.EventType, filterValue));
             }
 
             if (movieId.HasValue)
             {
                 int i = (int)movieId;
-                pagingSpec.FilterExpressions.Add(h => h.MovieId == i);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Core.History.History>(x => x.MovieId, i));
             }
 
             return ApplyToPage(_historyService.Paged, pagingSpec, MapToResource);

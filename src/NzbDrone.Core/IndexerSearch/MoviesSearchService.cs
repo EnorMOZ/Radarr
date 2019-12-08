@@ -66,7 +66,7 @@ namespace NzbDrone.Core.IndexerSearch
                 SortKey = "Id"
             };
 
-            pagingSpec.FilterExpressions.Add(v => v.Monitored == true);
+            pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Movie>(x => x.Monitored, true));
             List<Movie> movies = _movieService.MoviesWithoutFiles(pagingSpec).Records.ToList();
 
             var queue = _queueService.GetQueue().Where(q => q.Movie != null).Select(q => q.Movie.Id);
@@ -86,7 +86,7 @@ namespace NzbDrone.Core.IndexerSearch
                 SortKey = "Id"
             };
 
-            pagingSpec.FilterExpressions.Add(v => v.Monitored == true);
+            pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Movie>(x => x.Monitored, true));
 
             List<Movie> movies = _movieCutoffService.MoviesWhereCutoffUnmet(pagingSpec).Records.ToList();
 

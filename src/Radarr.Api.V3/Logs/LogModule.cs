@@ -1,4 +1,5 @@
 using System.Linq;
+using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Instrumentation;
 using Radarr.Http;
 
@@ -30,22 +31,22 @@ namespace Radarr.Api.V3.Logs
                 switch (levelFilter.Value)
                 {
                     case "fatal":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal");
+                        pageSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Log>(x => x.Level, "Fatal"));
                         break;
                     case "error":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal" || h.Level == "Error");
+                        pageSpec.FilterExpressions.Add(new WhereInPagingFilter<Log>(x => x.Level, new [] { "Fatal", "Error" }));
                         break;
                     case "warn":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal" || h.Level == "Error" || h.Level == "Warn");
+                        pageSpec.FilterExpressions.Add(new WhereInPagingFilter<Log>(x => x.Level, new [] { "Fatal", "Error", "Warn" }));
                         break;
                     case "info":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal" || h.Level == "Error" || h.Level == "Warn" || h.Level == "Info");
+                        pageSpec.FilterExpressions.Add(new WhereInPagingFilter<Log>(x => x.Level, new [] { "Fatal", "Error", "Warn", "Info" }));
                         break;
                     case "debug":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal" || h.Level == "Error" || h.Level == "Warn" || h.Level == "Info" || h.Level == "Debug");
+                        pageSpec.FilterExpressions.Add(new WhereInPagingFilter<Log>(x => x.Level, new [] { "Fatal", "Error", "Warn", "Info", "Debug" }));
                         break;
                     case "trace":
-                        pageSpec.FilterExpressions.Add(h => h.Level == "Fatal" || h.Level == "Error" || h.Level == "Warn" || h.Level == "Info" || h.Level == "Debug" || h.Level == "Trace");
+                        pageSpec.FilterExpressions.Add(new WhereInPagingFilter<Log>(x => x.Level, new [] { "Fatal", "Error", "Warn", "Info", "Debug", "Trace" }));
                         break;
                 }
             }

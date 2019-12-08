@@ -5,12 +5,11 @@ using Moq;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Movies;
 using NzbDrone.Core.Test.Framework;
-using NzbDrone.Core.Movies.Events;
 using System.Collections.Generic;
 
 namespace NzbDrone.Core.Test.BulkImport
 {
-	[TestFixture]
+    [TestFixture]
 	public class AddMultiMoviesFixture : CoreTest<MovieService>
 	{
 		private List<Movie> fakeMovies;
@@ -33,6 +32,9 @@ namespace NzbDrone.Core.Test.BulkImport
 			      .Setup(s => s.GetMovieFolder(It.IsAny<Movie>(), null))
 			      .Returns((Movie m, NamingConfig n) => m.Title);
 
+            Mocker.GetMock<IMovieRepository>().Setup(s => s.FindByTmdbId(It.IsAny<List<int>>()))
+                .Returns(new List<Movie>());
+
 			var movies = Subject.AddMovies(fakeMovies);
 
 			foreach (Movie movie in movies)
@@ -40,7 +42,7 @@ namespace NzbDrone.Core.Test.BulkImport
 				movie.Path.Should().NotBeNullOrEmpty();
 			}
 
-			//Subject.GetAllMovies().Should().HaveCount(3);
+			// Subject.GetAllMovies().Should().HaveCount(3);
 		}
 
 		[Test]
@@ -50,7 +52,8 @@ namespace NzbDrone.Core.Test.BulkImport
 				  .Setup(s => s.GetMovieFolder(It.IsAny<Movie>(), null))
 				  .Returns((Movie m, NamingConfig n) => m.Title);
 
-			Mocker.GetMock<IMovieRepository>().Setup(s => s.All()).Returns(new List<Movie> { fakeMovies[0] });
+			Mocker.GetMock<IMovieRepository>().Setup(s => s.FindByTmdbId(It.IsAny<List<int>>()))
+                .Returns(new List<Movie> { fakeMovies[0] });
 
 			var movies = Subject.AddMovies(fakeMovies);
 
@@ -64,12 +67,14 @@ namespace NzbDrone.Core.Test.BulkImport
 				  .Setup(s => s.GetMovieFolder(It.IsAny<Movie>(), null))
 				  .Returns((Movie m, NamingConfig n) => m.Title);
 
+            Mocker.GetMock<IMovieRepository>().Setup(s => s.FindByTmdbId(It.IsAny<List<int>>()))
+                .Returns(new List<Movie>());
+
 			fakeMovies[2].TmdbId = fakeMovies[0].TmdbId;
 
 			var movies = Subject.AddMovies(fakeMovies);
 
 			Mocker.GetMock<IMovieRepository>().Verify(v => v.InsertMany(It.Is<List<Movie>>(l => l.Count == 2)));
 		}
-
 	}
 }

@@ -38,7 +38,7 @@ namespace Radarr.Http
             PutValidator.RuleFor(r => r.Id).ValidId();
         }
 
-        protected PagingResource<TResource> ApplyToPage<TModel>(Func<PagingSpec<TModel>, PagingSpec<TModel>> function, PagingSpec<TModel> pagingSpec, Converter<TModel, TResource> mapper)
+        protected PagingResource<TResource> ApplyToPage<TModel>(Func<PagingSpec<TModel>, PagingSpec<TModel>> function, PagingSpec<TModel> pagingSpec, Converter<TModel, TResource> mapper) where TModel : ModelBase
         {
             pagingSpec = function(pagingSpec);
 

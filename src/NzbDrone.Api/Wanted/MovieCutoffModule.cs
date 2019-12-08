@@ -30,11 +30,11 @@ namespace NzbDrone.Api.Wanted
 
             if (filter != null && filter.Value == "false")
             {
-                pagingSpec.FilterExpressions.Add(v => v.Monitored == false);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Movie>(v => v.Monitored, false));
             }
             else
             {
-                pagingSpec.FilterExpressions.Add(v => v.Monitored == true);
+                pagingSpec.FilterExpressions.Add(new WhereEqualPagingFilter<Movie>(v => v.Monitored, true));
             }
 
             var resource = ApplyToPage(_movieCutoffService.MoviesWhereCutoffUnmet, pagingSpec, v => MapToResource(v, true));

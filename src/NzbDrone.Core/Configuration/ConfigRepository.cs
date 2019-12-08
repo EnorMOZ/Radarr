@@ -1,4 +1,4 @@
-using System.Linq;
+using Dapper;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Messaging.Events;
 
@@ -18,10 +18,12 @@ namespace NzbDrone.Core.Configuration
         {
         }
 
-
         public Config Get(string key)
         {
-            return Query.Where(c => c.Key == key).SingleOrDefault();
+            using (var conn = _database.OpenConnection())
+            {
+                return conn.QuerySingleOrDefault<Config>($"SELECT * FROM {_table} WHERE Key = @Key", new { Key = key });
+            }
         }
 
         public Config Upsert(string key, string value)

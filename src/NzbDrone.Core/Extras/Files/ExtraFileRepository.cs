@@ -24,27 +24,27 @@ namespace NzbDrone.Core.Extras.Files
 
         public void DeleteForMovie(int movieId)
         {
-            Delete(c => c.MovieId == movieId);
+            Delete(movieId);
         }
 
         public void DeleteForMovieFile(int movieFileId)
         {
-            Delete(c => c.MovieFileId == movieFileId);
+            Delete(Builder().WhereEqual<TExtraFile>(x => x.MovieFileId, movieFileId));
         }
 
         public List<TExtraFile> GetFilesByMovie(int movieId)
         {
-            return Query.Where(c => c.MovieId == movieId).ToList();
+            return Query(Builder().WhereEqual<TExtraFile>(x => x.MovieId, movieId));
         }
 
         public List<TExtraFile> GetFilesByMovieFile(int movieFileId)
         {
-            return Query.Where(c => c.MovieFileId == movieFileId).ToList();
+            return Query(Builder().WhereEqual<TExtraFile>(x => x.MovieFileId, movieFileId));
         }
 
         public TExtraFile FindByPath(string path)
         {
-            return Query.Where(c => c.RelativePath == path).SingleOrDefault();
+            return Query(Builder().WhereEqual<TExtraFile>(x => x.RelativePath, path)).SingleOrDefault();
         }
     }
 }
